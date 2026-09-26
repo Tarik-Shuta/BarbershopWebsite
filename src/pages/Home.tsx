@@ -3,7 +3,7 @@ import enterijer from "../assets/benterijer.png";
 export default function Home() {
     return (
         <section
-            className="h-155 relative bg-cover bg-center flex items-center"
+            className="min-h-screen relative bg-cover bg-center flex items-center"
             style={{ backgroundImage: `url(${enterijer})` }}
         >
         <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black/90 to-transparent"></div>

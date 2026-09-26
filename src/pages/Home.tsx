@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
 
-const services = [
+/*const services = [
     {
         number: "01",
         title: "Muško šišanje",
@@ -26,7 +26,7 @@ const services = [
         price: "30 KM",
         image: enterijer,
     },
-];
+];*/
 
 export default function Home() {
     return (
@@ -63,7 +63,7 @@ export default function Home() {
                         className="
                             pointer-events-none
                             absolute top-1/2 left-1/2
-                            h-[420px] w-[680px]
+                            h-105 w-170
                             -translate-x-1/2 -translate-y-1/2
                         "
                     >
@@ -249,7 +249,7 @@ export default function Home() {
                                 src={enterijer}
                                 alt="Urban Barbershop enterijer"
                                 className="
-                                    h-[420px] w-full
+                                    h-105 w-full
                                     object-cover
                                     transition-transform duration-700
                                     hover:scale-105

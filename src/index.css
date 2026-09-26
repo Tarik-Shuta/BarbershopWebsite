@@ -96,4 +96,42 @@ h2 {
 p {
   margin: 0;
 }
+  @keyframes floatBubbleOne {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+
+    50% {
+      transform: translate3d(35px, -20px, 0) rotate(8deg) scale(1.05);
+    }
+  }
+
+  @keyframes floatBubbleTwo {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    50% {
+      transform: translate3d(-28px, 22px, 0) rotate(-10deg);
+    }
+  }
+
+  @keyframes floatBubbleThree {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+      transform: translate3d(18px, -25px, 0) scale(1.08);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [class*="floatBubble"] {
+      animation: none;
+    }
+  }
 }

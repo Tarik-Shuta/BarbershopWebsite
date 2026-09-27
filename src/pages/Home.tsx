@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
 import BarbershopMap from "../components/BarbershopMap.tsx";
+import BarbersSection from "../components/BarbersSection.tsx";
 
 /*const services = [
     {
@@ -32,6 +33,7 @@ import BarbershopMap from "../components/BarbershopMap.tsx";
 export default function Home() {
     return (
         <main className="overflow-hidden bg-[#041426] text-white">
+
 
             {/* =========================================================
                 HERO
@@ -220,7 +222,7 @@ export default function Home() {
                     "
                 />
 
-                <div className="relative mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:items-center lg:px-8">
+                <div className="relative mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:items-center lg:px-8 mb-12">
 
                     {/* Image */}
                     <div className="relative">
@@ -241,7 +243,7 @@ export default function Home() {
                                 rounded-4xl
                                 border border-white/10
                                 bg-white/5
-                                shadow-[0_30px_100px_rgba(0,0,0,0.35)]
+                                shadow-[0_10px_100px_rgba(0,0,0,0.35)]
                             ">
                             <div className="h-120">
                                 <BarbershopMap />
@@ -283,7 +285,7 @@ export default function Home() {
                                 sm:text-5xl
                             "
                         >
-                            Više od običnog šišanja.
+                            Stil počinje dobrim šišanjem.
                         </h2>
 
                         <p
@@ -294,20 +296,25 @@ export default function Home() {
                                 sm:text-lg
                             "
                         >
-                            Urban Barbershop je moderan prostor posvećen preciznosti,
-                            stilu i opuštenoj atmosferi. Cilj nam je da svaki klijent
-                            izađe zadovoljan i sa frizurom koja mu zaista odgovara.
+                            Urban Barbershop je mjesto za dobar stil, precizno šišanje i opuštenu atmosferu.
+                            Svakom klijentu pristupamo individualno kako bi dobio frizuru i izgled koji mu stvarno odgovaraju.
                         </p>
 
                     </div>
+
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -bottom-70 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-400/5 blur-[100px]"
+                    />
+
                 </div>
+                <BarbersSection />
             </section>
 
 
 
-            {/* =========================================================
-                BOTTOM CTA
-            ========================================================= */}
+
+            {/* futer */}
             <section className="border-t border-white/5 bg-[#03101f]">
                 <div
                     className="

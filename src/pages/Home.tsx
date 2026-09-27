@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
 import BarbershopMap from "../components/BarbershopMap.tsx";
 import BarbersSection from "../components/BarbersSection.tsx";
+import Prices from "../components/Prices.tsx";
 
 /*const services = [
     {
@@ -205,10 +206,11 @@ export default function Home() {
             <section
                 id="about"
                 className="
-                    relative overflow-hidden
-                    border-t border-white/5
-                    py-24 sm:py-32
-                "
+         relative overflow-hidden
+         border-t border-white/5
+         pt-24 pb-10
+          sm:pt-32 sm:pb-14
+    "
             >
                 {/* Background decoration */}
                 <div
@@ -309,7 +311,9 @@ export default function Home() {
 
                 </div>
                 <BarbersSection />
+
             </section>
+            <Prices />
 
 
 

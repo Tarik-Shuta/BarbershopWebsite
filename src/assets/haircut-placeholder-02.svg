@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1125" viewBox="0 0 900 1125" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="30" x2="830" y2="1090" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38414A"/>
+      <stop offset="1" stop-color="#111C27"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="322" y1="374" x2="630" y2="790" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D0A37F"/>
+      <stop offset="1" stop-color="#8A6348"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h900v1125H0z"/>
+  <path stroke="#7DD3E7" stroke-opacity=".18" d="M52 52h796v1021H52z"/>
+  <path fill="#17212A" d="M99 1125c57-189 181-286 352-286 169 0 290 97 350 286H99Z"/>
+  <path fill="url(#skin)" d="M302 480c0-169 67-282 198-282 129 0 207 104 207 269v94c0 145-87 245-207 245S302 706 302 561v-81Z"/>
+  <path fill="#171A1C" d="M286 492c-44-224 27-368 217-368 172 0 237 122 193 354-20-72-54-108-99-133-67 36-156 40-260 10-21 39-37 84-51 137Z"/>
+  <path fill="#24282A" d="M286 348c40-194 159-265 311-214-135-4-191 70-203 146-44 7-79 31-108 68Z"/>
+  <path d="M372 541c27-15 54-15 80 0M582 541c24-14 48-14 71 0" stroke="#7D5744" stroke-width="10" stroke-linecap="round"/>
+  <path d="M449 710c40 20 80 20 120 0" stroke="#50372E" stroke-width="12" stroke-linecap="round"/>
+  <path fill="#071521" fill-opacity=".8" d="M52 916h796v157H52z"/>
+  <text x="84" y="984" fill="#8FE5F2" font-family="Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="5">FOTOGRAFIJA RADOVA</text>
+  <text x="84" y="1035" fill="#FFFFFF" fill-opacity=".6" font-family="Arial,sans-serif" font-size="19" letter-spacing="3">PLACEHOLDER 02</text>
+</svg>

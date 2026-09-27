@@ -27,7 +27,7 @@ export default function BarbersSection() {
     return (
         <section
             aria-labelledby="barbers-heading"
-            className="relative overflow-hidden bg-[#041426] py-24 sm:py-32"
+            className="relative overflow-hidden bg-[#041426] pt-12 pb-8 sm:pt-16 sm:pb-4"
         >
             <div
                 aria-hidden="true"

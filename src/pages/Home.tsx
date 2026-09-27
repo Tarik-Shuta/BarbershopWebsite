@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
+import BarbershopMap from "../components/BarbershopMap.tsx";
 
 /*const services = [
     {
@@ -196,7 +197,6 @@ export default function Home() {
                 </div>
             </section>
 
-
             {/* =========================================================
                 O NAMA
             ========================================================= */}
@@ -236,25 +236,16 @@ export default function Home() {
                             "
                         />
 
-                        <div
-                            className="
+                        <div className="
                                 relative overflow-hidden
                                 rounded-4xl
                                 border border-white/10
                                 bg-white/5
                                 shadow-[0_30px_100px_rgba(0,0,0,0.35)]
-                            "
-                        >
-                            <img
-                                src={enterijer}
-                                alt="Urban Barbershop enterijer"
-                                className="
-                                    h-105 w-full
-                                    object-cover
-                                    transition-transform duration-700
-                                    hover:scale-105
-                                "
-                            />
+                            ">
+                            <div className="h-120">
+                                <BarbershopMap />
+                            </div>
 
                             <div
                                 className="

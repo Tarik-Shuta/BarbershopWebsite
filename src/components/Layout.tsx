@@ -1,15 +1,72 @@
-import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Outlet } from 'react-router-dom'
 import Logo from '../assets/Urban.png'
 
 const navItems = [
-    { label: 'O nama', to: '/aboutme' },
-    { label: 'Usluge', to: '/usluge' },
-    { label: 'Kontakt', to: '/kontakt' },
+    { label: 'O nama', href: '#o-nama', id: 'o-nama' },
+    { label: 'Naš tim', href: '#nas-tim', id: 'nas-tim' },
+    { label: 'Usluge', href: '#usluge', id: 'usluge' },
+    { label: 'Kontakt', href: '#kontakt', id: 'kontakt' },
 ]
 
 export default function Layout() {
     const [menuOpen, setMenuOpen] = useState(false)
+    const [activeSection, setActiveSection] = useState('')
+
+    useEffect(() => {
+        const sections = navItems
+            .map((item) => document.getElementById(item.id))
+            .filter((section): section is HTMLElement => section !== null)
+
+        const sectionObserver = new IntersectionObserver(
+            (entries) => {
+                const visibleSection = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+
+                if (visibleSection) {
+                    setActiveSection(visibleSection.target.id)
+                }
+            },
+            { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.25, 0.5] },
+        )
+
+        sections.forEach((section) => sectionObserver.observe(section))
+
+        const revealElements = document.querySelectorAll<HTMLElement>('[data-reveal]')
+        const revealObserver = new IntersectionObserver(
+            (entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible')
+                        observer.unobserve(entry.target)
+                    }
+                })
+            },
+            { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
+        )
+
+        revealElements.forEach((element) => {
+            element.classList.add('reveal-ready')
+            revealObserver.observe(element)
+        })
+
+        return () => {
+            sectionObserver.disconnect()
+            revealObserver.disconnect()
+        }
+    }, [])
+
+    useEffect(() => {
+        const closeMenu = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setMenuOpen(false)
+            }
+        }
+
+        document.addEventListener('keydown', closeMenu)
+        return () => document.removeEventListener('keydown', closeMenu)
+    }, [])
 
     return (
         <>
@@ -28,8 +85,8 @@ export default function Layout() {
                 <nav className="mx-auto grid h-20 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-6 lg:px-8">
 
                     {/* Logo */}
-                    <NavLink
-                        to="/"
+                    <a
+                        href="#top"
                         onClick={() => setMenuOpen(false)}
                         className="
             group relative
@@ -48,29 +105,25 @@ export default function Layout() {
                 group-hover:scale-[1.03]
             "
                         />
-                    </NavLink>
+                    </a>
 
                     <div className="hidden items-center gap-10 md:flex">
                         {navItems.map((item) => (
-                            <NavLink
-                                key={item.to}
-                                to={item.to}
-                                className={({ isActive }) =>
-                                    `
+                            <a
+                                key={item.href}
+                                href={item.href}
+                                aria-current={activeSection === item.id ? 'location' : undefined}
+                                className={`
                     group relative py-2
                     text-sm font-medium tracking-wide
                     transition-colors duration-300
-                    ${
-                                        isActive
+                    ${activeSection === item.id
                                             ? 'text-white'
                                             : 'text-white/65 hover:text-white'
                                     }
-                `
-                                }
+                `}
                             >
-                                {({ isActive }) => (
-                                    <>
-                                        {item.label}
+                                {item.label}
 
                                         <span
                                             className={`
@@ -79,21 +132,18 @@ export default function Layout() {
                                 rounded-full
                                 bg-cyan-400
                                 transition-all duration-300
-                                ${
-                                                isActive
+                                ${activeSection === item.id
                                                     ? 'w-full opacity-100'
                                                     : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                                             }
                             `}
                                         />
-                                    </>
-                                )}
-                            </NavLink>
+                            </a>
                         ))}
                     </div>
 
-                    <NavLink
-                        to="/kontakt"
+                    <a
+                        href="#kontakt"
                         className="
             group relative hidden
             justify-self-end
@@ -122,7 +172,7 @@ export default function Layout() {
                 →
             </span>
         </span>
-                    </NavLink>
+                    </a>
 
 
                     <button
@@ -188,30 +238,28 @@ export default function Layout() {
                 >
                     <div className="mx-auto flex max-w-7xl flex-col px-5 py-5 sm:px-6">
                         {navItems.map((item) => (
-                            <NavLink
-                                key={item.to}
-                                to={item.to}
+                            <a
+                                key={item.href}
+                                href={item.href}
                                 onClick={() => setMenuOpen(false)}
-                                className={({ isActive }) =>
-                                    `
+                                aria-current={activeSection === item.id ? 'location' : undefined}
+                                className={`
                                     border-b border-white/5
                                     py-4
                                     text-base font-medium
                                     transition-colors duration-300
-                                    ${
-                                        isActive
+                                    ${activeSection === item.id
                                             ? 'text-cyan-300'
                                             : 'text-white/70 hover:text-white'
                                     }
-                                `
-                                }
+                                `}
                             >
                                 {item.label}
-                            </NavLink>
+                            </a>
                         ))}
 
-                        <NavLink
-                            to="/kontakt"
+                        <a
+                            href="#kontakt"
                             onClick={() => setMenuOpen(false)}
                             className="
                                 mt-5 flex items-center justify-center
@@ -225,7 +273,7 @@ export default function Layout() {
                             "
                         >
                             Zakaži termin
-                        </NavLink>
+                        </a>
                     </div>
                 </div>
             </header>

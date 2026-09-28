@@ -1,6 +1,7 @@
-import haircutPlaceholder01 from "../assets/haircut-placeholder-01.svg";
-import haircutPlaceholder02 from "../assets/haircut-placeholder-02.svg";
-import haircutPlaceholder03 from "../assets/haircut-placeholder-03.svg";
+import haircut1 from "../assets/Haircut1.png"
+import haircut2 from "../assets/Haircut2.png"
+import haircut3 from "../assets/Haircut3.png"
+import haircut4 from "../assets/Haircut4.png"
 
 const services = [
     { name: "Šišanje", price: "20 KM" },
@@ -13,20 +14,20 @@ const services = [
 
 const haircutImages = [
     {
-        image: haircutPlaceholder01,
+        image: haircut1,
         label: "Fade",
     },
     {
-        image: haircutPlaceholder02,
+        image: haircut3,
         label: "Classic",
     },
     {
-        image: haircutPlaceholder03,
+        image: haircut4,
         label: "Modern",
     },
     {
-        // Temporary reuse until you add a fourth real photo
-        image: haircutPlaceholder01,
+
+        image: haircut2,
         label: "Urban",
     },
 ];
@@ -38,7 +39,6 @@ function HaircutCard({
                      }: {
     image: string;
     label: string;
-    number: string;
     className?: string;
 }) {
     return (
@@ -142,7 +142,7 @@ export default function Prices() {
         <section
             id="usluge"
             aria-labelledby="services-heading"
-            className="relative overflow-hidden bg-[#041426] pt-16 pb-8 sm:pt-20 sm:pb-10"
+            className="relative scroll-mt-20 overflow-hidden bg-[#041426] pt-16 pb-8 sm:pt-20 sm:pb-10"
         >
             {/* Background glow */}
             <div
@@ -151,7 +151,7 @@ export default function Prices() {
                 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/[0.04] blur-[110px]"
             />
 
-            <div className="relative mx-auto max-w-[90rem] px-5 sm:px-6 lg:px-8">
+            <div data-reveal className="relative mx-auto max-w-[90rem] px-5 sm:px-6 lg:px-8">
                 {/* Heading */}
                 <div className="mx-auto mb-12 max-w-2xl text-center">
                     <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300 sm:text-sm">
@@ -181,14 +181,12 @@ export default function Prices() {
                         <HaircutCard
                             image={haircutImages[0].image}
                             label={haircutImages[0].label}
-                            number="01"
                             className="h-[58%]"
                         />
 
                         <HaircutCard
                             image={haircutImages[1].image}
                             label={haircutImages[1].label}
-                            number="02"
                             className="ml-8 h-[42%]"
                         />
                     </div>
@@ -295,14 +293,12 @@ export default function Prices() {
                         <HaircutCard
                             image={haircutImages[2].image}
                             label={haircutImages[2].label}
-                            number="03"
                             className="mr-8 h-[42%]"
                         />
 
                         <HaircutCard
                             image={haircutImages[3].image}
                             label={haircutImages[3].label}
-                            number="04"
                             className="h-[58%]"
                         />
                     </div>
@@ -317,7 +313,6 @@ export default function Prices() {
                                 key={`${item.label}-${index}`}
                                 image={item.image}
                                 label={item.label}
-                                number={`0${index + 1}`}
                                 className="aspect-[4/5]"
                             />
                         ))}

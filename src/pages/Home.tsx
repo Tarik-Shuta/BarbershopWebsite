@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
 import BarbershopMap from "../components/BarbershopMap.tsx";
 import BarbersSection from "../components/BarbersSection.tsx";
 import Prices from "../components/Prices.tsx";
+import ContactSection from "../components/ContactSection.tsx";
 
 /*const services = [
     {
@@ -40,6 +40,7 @@ export default function Home() {
                 HERO
             ========================================================= */}
             <section
+                id="top"
                 className="
                     relative flex min-h-[calc(100svh-5rem)]
                     items-center justify-center overflow-hidden
@@ -161,8 +162,8 @@ export default function Home() {
                         </p>
 
                         <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
-                            <Link
-                                to="/kontakt"
+                            <a
+                                href="#kontakt"
                                 className="
                                     inline-flex min-w-44 items-center justify-center
                                     rounded-full bg-cyan-400 px-6 py-3.5
@@ -175,10 +176,10 @@ export default function Home() {
                                 "
                             >
                                 Zakaži termin
-                            </Link>
+                            </a>
 
-                            <Link
-                                to="/usluge"
+                            <a
+                                href="#usluge"
                                 className="
                                     inline-flex min-w-44 items-center justify-center
                                     rounded-full
@@ -194,7 +195,7 @@ export default function Home() {
                                 "
                             >
                                 Pogledaj usluge
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -204,9 +205,9 @@ export default function Home() {
                 O NAMA
             ========================================================= */}
             <section
-                id="about"
+                id="o-nama"
                 className="
-         relative overflow-hidden
+         relative scroll-mt-20 overflow-hidden
          border-t border-white/5
          pt-24 pb-10
           sm:pt-32 sm:pb-14
@@ -224,7 +225,7 @@ export default function Home() {
                     "
                 />
 
-                <div className="relative mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:items-center lg:px-8 mb-12">
+                <div data-reveal className="relative mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:items-center lg:px-8 mb-12">
 
                     {/* Image */}
                     <div className="relative">
@@ -314,12 +315,13 @@ export default function Home() {
 
             </section>
             <Prices />
+            <ContactSection />
 
 
 
 
-            {/* futer */}
-            <section className="border-t border-white/5 bg-[#03101f]">
+            {/* Footer */}
+            <footer className="border-t border-white/5 bg-[#03101f]">
                 <div
                     className="
                         mx-auto flex max-w-7xl
@@ -344,7 +346,7 @@ export default function Home() {
                         © {new Date().getFullYear()} Urban Barbershop
                     </p>
                 </div>
-            </section>
+            </footer>
         </main>
     );
 }

@@ -1,4 +1,4 @@
-import Harun from "../assets/harun.png"
+import Harun from "../assets/Harun.png"
 const barbers = [
     {
         name: "Harun",

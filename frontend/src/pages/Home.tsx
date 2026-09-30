@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import enterijer from "../assets/benterijer.png";
 import BarbershopMap from "../components/BarbershopMap.tsx";
 import BarbersSection from "../components/BarbersSection.tsx";
@@ -162,8 +163,8 @@ export default function Home() {
                         </p>
 
                         <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
-                            <a
-                                href="#kontakt"
+                            <Link
+                                to="/book"
                                 className="
                                     inline-flex min-w-44 items-center justify-center
                                     rounded-full bg-cyan-400 px-6 py-3.5
@@ -176,7 +177,7 @@ export default function Home() {
                                 "
                             >
                                 Zakaži termin
-                            </a>
+                            </Link>
 
                             <a
                                 href="#usluge"

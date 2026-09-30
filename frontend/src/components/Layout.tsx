@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import Logo from '../assets/Urban.png'
 
 const navItems = [
@@ -142,8 +142,8 @@ export default function Layout() {
                         ))}
                     </div>
 
-                    <a
-                        href="#kontakt"
+                    <Link
+                        to="/book"
                         className="
             group relative hidden
             justify-self-end
@@ -172,7 +172,7 @@ export default function Layout() {
                 →
             </span>
         </span>
-                    </a>
+                    </Link>
 
 
                     <button
@@ -258,8 +258,8 @@ export default function Layout() {
                             </a>
                         ))}
 
-                        <a
-                            href="#kontakt"
+                        <Link
+                            to="/book"
                             onClick={() => setMenuOpen(false)}
                             className="
                                 mt-5 flex items-center justify-center
@@ -273,7 +273,7 @@ export default function Layout() {
                             "
                         >
                             Zakaži termin
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </header>

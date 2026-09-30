@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import haircut1 from "../assets/Haircut1.png"
 import haircut2 from "../assets/Haircut2.png"
 import haircut3 from "../assets/Haircut3.png"
@@ -263,8 +264,8 @@ export default function Prices() {
                                 Spreman za svoj novi stil?
                             </p>
 
-                            <a
-                                href="#kontakt"
+                            <Link
+                                to="/book"
                                 className="group inline-flex items-center gap-2 rounded-full bg-cyan-400
                                 px-5 py-2.5 text-sm font-semibold text-[#071c33]
                                 transition-all duration-200 ease-out
@@ -284,7 +285,7 @@ export default function Prices() {
                                 >
                                     →
                                 </span>
-                            </a>
+                            </Link>
                         </div>
                     </article>
 
@@ -376,8 +377,8 @@ export default function Prices() {
                                 Spreman za svoj novi stil?
                             </p>
 
-                            <a
-                                href="#kontakt"
+                            <Link
+                                to="/book"
                                 className="group inline-flex items-center gap-2 rounded-full bg-cyan-400
                                 px-5 py-2.5 text-sm font-semibold text-[#071c33]
                                 transition-colors duration-200 hover:bg-cyan-300"
@@ -389,7 +390,7 @@ export default function Prices() {
                                 >
                                     →
                                 </span>
-                            </a>
+                            </Link>
                         </div>
                     </article>
                 </div>

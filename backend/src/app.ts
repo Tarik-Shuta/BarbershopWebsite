@@ -5,7 +5,7 @@ import { authRouter } from "./routes/auth.js";
 import { bookingsRouter } from "./routes/bookings.js";
 
 const app = express();
-const frontendUrls = (process.env.FRONTEND_URL ?? "http://localhost:5173")
+const frontendUrls = (process.env.FRONTEND_URL ?? "http://localhost:5173,https://urban-barbershop.onrender.com")
   .split(",")
   .map((url) => url.trim())
   .filter(Boolean);

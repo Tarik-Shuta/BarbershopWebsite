@@ -7,9 +7,10 @@ export type SessionUser = {
   barberName: string | null;
 };
 
-const apiUrl = (
-    import.meta.env.VITE_API_URL ?? "http://localhost:3000"
-).replace(/\/+$/, "");
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const apiUrl = (configuredApiUrl || (import.meta.env.DEV ? "http://localhost:3000" : ""))
+  .replace(/\/+$/, "")
+  .replace(/\/api$/i, "");
 
 export const getSession = () => {
   try {
@@ -36,7 +37,9 @@ export async function api(path: string, options: RequestInit = {}) {
   const session = getSession();
   const headers = new Headers(options.headers);
 
-  console.log("API URL:", apiUrl);
+  if (!apiUrl && import.meta.env.PROD) {
+    throw new Error("VITE_API_URL is not configured for this frontend deployment");
+  }
   if (options.body) {
     headers.set("Content-Type", "application/json");
   }

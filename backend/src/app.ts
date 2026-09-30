@@ -5,9 +5,12 @@ import { authRouter } from "./routes/auth.js";
 import { bookingsRouter } from "./routes/bookings.js";
 
 const app = express();
-const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
+const frontendUrls = (process.env.FRONTEND_URL ?? "http://localhost:5173")
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
 
-app.use(cors({ origin: frontendUrl }));
+app.use(cors({ origin: frontendUrls }));
 app.use(express.json({ limit: "10kb" }));
 
 app.get("/health", (_request, response) => {

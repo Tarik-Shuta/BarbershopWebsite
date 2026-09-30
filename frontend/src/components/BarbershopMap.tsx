@@ -22,7 +22,7 @@ export default function BarbershopMap() {
         const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
         if (!accessToken) {
-            console.error("Missing VITE_MAPBOX_ACCESS_TOKEN");
+            console.error("Mapbox is not configured: add VITE_MAPBOX_ACCESS_TOKEN to the frontend hosting environment and rebuild.");
             return;
         }
 
@@ -50,6 +50,10 @@ export default function BarbershopMap() {
         });
 
         mapRef.current = map;
+
+        map.on("error", (event) => {
+            console.error("Mapbox map error:", event.error);
+        });
 
         map.addControl(
             new mapboxgl.NavigationControl({

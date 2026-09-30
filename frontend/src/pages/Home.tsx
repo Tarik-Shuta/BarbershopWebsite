@@ -11,7 +11,7 @@ import ContactSection from "../components/ContactSection.tsx";
         description:
             "Precizno šišanje prilagođeno vašem stilu, obliku lica i željenom izgledu.",
         price: "20 KM",
-        image: enterijer,
+        image: enterijer,e
     },
     {
         number: "02",

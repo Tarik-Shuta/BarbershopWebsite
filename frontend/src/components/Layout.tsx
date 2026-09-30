@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import Logo from '../assets/Urban.png'
+import { clearSession, getSession } from '../lib/session.ts'
+import { useNavigate } from 'react-router-dom'
 
 const navItems = [
     { label: 'O nama', href: '#o-nama', id: 'o-nama' },
@@ -12,6 +14,11 @@ const navItems = [
 export default function Layout() {
     const [menuOpen, setMenuOpen] = useState(false)
     const [activeSection, setActiveSection] = useState('')
+    const [session, setSession] = useState(getSession())
+    const navigate = useNavigate()
+    const location = useLocation()
+
+    useEffect(() => setSession(getSession()), [location.pathname])
 
     useEffect(() => {
         const sections = navItems
@@ -142,11 +149,11 @@ export default function Layout() {
                         ))}
                     </div>
 
+                    <div className="hidden items-center gap-4 justify-self-end md:flex">
                     <Link
                         to="/book"
                         className="
             group relative hidden
-            justify-self-end
             overflow-hidden rounded-full
             border border-cyan-300/20
             bg-cyan-400
@@ -173,6 +180,14 @@ export default function Layout() {
             </span>
         </span>
                     </Link>
+
+                        {session ? <>
+                            <Link to={session.user.role === 'BARBER' ? '/barber' : '/book'} className="text-sm text-white/75 hover:text-white">
+                                {session.user.role === 'BARBER' ? 'Dashboard' : session.user.name}
+                            </Link>
+                            <button onClick={() => { clearSession(); setSession(null); navigate('/'); }} className="text-sm text-white/50 hover:text-white">Odjava</button>
+                        </> : <Link to="/account" className="text-sm text-white/75 hover:text-white">Prijava</Link>}
+                    </div>
 
 
                     <button
@@ -274,6 +289,7 @@ export default function Layout() {
                         >
                             Zakaži termin
                         </Link>
+                        {session ? <button onClick={() => { clearSession(); setSession(null); setMenuOpen(false); }} className="mt-4 py-3 text-left text-sm text-white/70">Odjava</button> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
                     </div>
                 </div>
             </header>

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import { authRouter } from "./routes/auth.js";
 import { bookingsRouter } from "./routes/bookings.js";
 
 const app = express();
@@ -13,6 +14,7 @@ app.get("/health", (_request, response) => {
   response.json({ status: "ok", message: "Urban Barbershop API is running" });
 });
 
+app.use("/api/auth", authRouter);
 app.use("/api/bookings", bookingsRouter);
 
 app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {

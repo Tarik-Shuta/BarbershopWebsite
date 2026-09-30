@@ -86,7 +86,7 @@ export default function Layout() {
 
                     {/* Logo */}
                     <a
-                        href="#top"
+                        href="/"
                         onClick={() => setMenuOpen(false)}
                         className="
             group relative

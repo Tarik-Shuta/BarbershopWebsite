@@ -83,7 +83,7 @@ bookingsRouter.get("/queue", requireAuth, requireBarber, async (request, respons
     where: {
       barber: request.user!.barberName!,
       OR: [
-        { startsAt: { gte: now }, status: "PENDING" },
+        { status: "PENDING" },
         { startsAt: { gte: now, lt: dayEnd }, status: "CONFIRMED" },
       ],
     },

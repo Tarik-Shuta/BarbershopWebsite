@@ -78,17 +78,29 @@ bookingsRouter.get("/mine", requireAuth, async (request, response) => {
 
 bookingsRouter.get("/queue", requireAuth, requireBarber, async (request, response) => {
   const now = new Date();
-  const dayStart = new Date(now); dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
+  const dayEnd = new Date(now); dayEnd.setHours(24, 0, 0, 0);
   const bookings = await prisma.booking.findMany({
     where: {
       barber: request.user!.barberName!,
       OR: [
         { startsAt: { gte: now }, status: "PENDING" },
-        { startsAt: { gte: dayStart, lt: dayEnd }, status: { in: ["CONFIRMED", "DECLINED"] } },
+        { startsAt: { gte: now, lt: dayEnd }, status: "CONFIRMED" },
       ],
     },
     include: { user: { select: { email: true } } }, orderBy: { startsAt: "asc" },
+  });
+  response.json({ bookings });
+});
+
+bookingsRouter.get("/history", requireAuth, requireBarber, async (request, response) => {
+  const bookings = await prisma.booking.findMany({
+    where: {
+      barber: request.user!.barberName!,
+      status: "CONFIRMED",
+      startsAt: { lt: new Date() },
+    },
+    orderBy: { startsAt: "desc" },
+    take: 50,
   });
   response.json({ bookings });
 });
@@ -107,7 +119,7 @@ bookingsRouter.get("/schedule", requireAuth, requireBarber, async (request, resp
     where: {
       barber: request.user!.barberName!,
       status: "CONFIRMED",
-      startsAt: { gte: new Date(parsed.data.from), lt: new Date(parsed.data.to) },
+      startsAt: { gte: new Date(Math.max(new Date(parsed.data.from).getTime(), Date.now())), lt: new Date(parsed.data.to) },
     },
     orderBy: { startsAt: "asc" },
   });

@@ -15,7 +15,7 @@ test("accepts a valid booking without optional notes", () => {
 });
 
 test("rejects incomplete booking details", () => {
-  const result = createBookingSchema.safeParse({ ...validBooking, name: " " });
+  const result = createBookingSchema.safeParse({ ...validBooking, barber: " " });
 
   assert.equal(result.success, false);
 });

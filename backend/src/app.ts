@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { authRouter } from "./routes/auth.js";
 import { bookingsRouter } from "./routes/bookings.js";
+import { prisma } from "./lib/prisma.js";
 
 const app = express();
 const frontendUrls = (process.env.FRONTEND_URL ?? "http://localhost:5173,https://urban-barbershop.onrender.com")
@@ -13,8 +14,14 @@ const frontendUrls = (process.env.FRONTEND_URL ?? "http://localhost:5173,https:/
 app.use(cors({ origin: frontendUrls }));
 app.use(express.json({ limit: "10kb" }));
 
-app.get("/health", (_request, response) => {
-  response.json({ status: "ok", message: "Urban Barbershop API is running" });
+app.get("/health", async (_request, response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    response.json({ status: "ok", database: "connected", message: "Urban Barbershop API is running" });
+  } catch (error) {
+    console.error("Database health check failed:", error);
+    response.status(503).json({ status: "error", database: "disconnected", message: "The API is running but cannot reach its database" });
+  }
 });
 
 app.use("/api/auth", authRouter);

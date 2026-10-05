@@ -132,7 +132,6 @@ p {
       transform: translate3d(18px, -25px, 0) scale(1.08);
     }
 }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

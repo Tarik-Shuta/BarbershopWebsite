@@ -143,7 +143,7 @@ export default function Prices() {
         <section
             id="usluge"
             aria-labelledby="services-heading"
-            className="relative scroll-mt-20 overflow-hidden bg-[#041426] pt-16 pb-8 sm:pt-20 sm:pb-10"
+            className="relative scroll-mt-24 overflow-hidden bg-[#041426] pt-16 pb-8 sm:pt-20 sm:pb-10"
         >
             {/* Background glow */}
             <div

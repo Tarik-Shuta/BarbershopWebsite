@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Logo from '../assets/Urban.png'
 import { clearSession, getSession } from '../lib/session.ts'
-import { useNavigate } from 'react-router-dom'
 
 const navItems = [
-    { label: 'O nama', href: '#o-nama', id: 'o-nama' },
-    { label: 'Naš tim', href: '#nas-tim', id: 'nas-tim' },
-    { label: 'Usluge', href: '#usluge', id: 'usluge' },
-    { label: 'Kontakt', href: '#kontakt', id: 'kontakt' },
+    { label: 'O nama', id: 'o-nama' },
+    { label: 'Naš tim', id: 'nas-tim' },
+    { label: 'Usluge', id: 'usluge' },
+    { label: 'Kontakt', id: 'kontakt' },
 ]
 
 export default function Layout() {
@@ -18,13 +17,22 @@ export default function Layout() {
     const navigate = useNavigate()
     const location = useLocation()
 
+    const handleSectionNavigation = (id: string) => {
+        const hash = `#${id}`
+
+        setMenuOpen(false)
+
+        if (location.pathname === '/' && location.hash === hash) {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            return
+        }
+
+        navigate({ pathname: '/', hash })
+    }
+
     useEffect(() => setSession(getSession()), [location.pathname])
 
     useEffect(() => {
-        const sections = navItems
-            .map((item) => document.getElementById(item.id))
-            .filter((section): section is HTMLElement => section !== null)
-
         const sectionObserver = new IntersectionObserver(
             (entries) => {
                 const visibleSection = entries
@@ -38,7 +46,23 @@ export default function Layout() {
             { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.25, 0.5] },
         )
 
-        sections.forEach((section) => sectionObserver.observe(section))
+        const observedSections = new Set<HTMLElement>()
+        const observeSections = () => {
+            navItems.forEach(({ id }) => {
+                const section = document.getElementById(id)
+
+                if (section && !observedSections.has(section)) {
+                    observedSections.add(section)
+                    sectionObserver.observe(section)
+                }
+            })
+        }
+
+        observeSections()
+
+        // The Outlet's route content can mount after Layout, so observe added sections too.
+        const sectionMutationObserver = new MutationObserver(observeSections)
+        sectionMutationObserver.observe(document.body, { childList: true, subtree: true })
 
         const revealElements = document.querySelectorAll<HTMLElement>('[data-reveal]')
         const revealObserver = new IntersectionObserver(
@@ -60,9 +84,54 @@ export default function Layout() {
 
         return () => {
             sectionObserver.disconnect()
+            sectionMutationObserver.disconnect()
             revealObserver.disconnect()
         }
-    }, [])
+    }, [location.pathname])
+
+    useEffect(() => {
+        if (location.pathname !== '/' || !location.hash) {
+            return
+        }
+
+        const sectionId = location.hash.slice(1)
+        let animationFrame: number | undefined
+
+        const scrollToSection = () => {
+            const section = document.getElementById(sectionId)
+
+            if (!section) {
+                return false
+            }
+
+            animationFrame = requestAnimationFrame(() => {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            })
+            return true
+        }
+
+        if (scrollToSection()) {
+            return () => {
+                if (animationFrame !== undefined) {
+                    cancelAnimationFrame(animationFrame)
+                }
+            }
+        }
+
+        const homeMutationObserver = new MutationObserver(() => {
+            if (scrollToSection()) {
+                homeMutationObserver.disconnect()
+            }
+        })
+        homeMutationObserver.observe(document.body, { childList: true, subtree: true })
+
+        return () => {
+            homeMutationObserver.disconnect()
+            if (animationFrame !== undefined) {
+                cancelAnimationFrame(animationFrame)
+            }
+        }
+    }, [location.hash, location.pathname])
 
     useEffect(() => {
         const closeMenu = (event: KeyboardEvent) => {
@@ -109,16 +178,18 @@ export default function Layout() {
                             className="
                 h-20 w-auto object-contain
                 transition-transform duration-300
-                group-hover:scale-[1.03]
-            "
-                        />
+                group-hover:scale-[1.03]"/>
                     </a>
 
                     <div className="hidden items-center gap-10 md:flex">
                         {navItems.map((item) => (
                             <a
-                                key={item.href}
-                                href={item.href}
+                                key={item.id}
+                                href={`#${item.id}`}
+                                onClick={(event) => {
+                                    event.preventDefault()
+                                    handleSectionNavigation(item.id)
+                                }}
                                 aria-current={activeSection === item.id ? 'location' : undefined}
                                 className={`
                     group relative py-2
@@ -254,9 +325,12 @@ export default function Layout() {
                     <div className="mx-auto flex max-w-7xl flex-col px-5 py-5 sm:px-6">
                         {navItems.map((item) => (
                             <a
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setMenuOpen(false)}
+                                key={item.id}
+                                href={`#${item.id}`}
+                                onClick={(event) => {
+                                    event.preventDefault()
+                                    handleSectionNavigation(item.id)
+                                }}
                                 aria-current={activeSection === item.id ? 'location' : undefined}
                                 className={`
                                     border-b border-white/5

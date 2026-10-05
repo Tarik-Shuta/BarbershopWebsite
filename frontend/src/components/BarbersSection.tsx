@@ -28,7 +28,7 @@ export default function BarbersSection() {
         <section
             id="nas-tim"
             aria-labelledby="barbers-heading"
-            className="relative scroll-mt-20 overflow-hidden bg-[#041426] pt-12 pb-8 sm:pt-16 sm:pb-4"
+            className="relative scroll-mt-24 overflow-hidden bg-[#041426] pt-12 pb-8 sm:pt-16 sm:pb-4"
         >
             <div
                 aria-hidden="true"

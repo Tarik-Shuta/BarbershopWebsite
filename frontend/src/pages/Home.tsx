@@ -128,11 +128,12 @@ export default function Home() {
                     <div className="relative z-10 flex flex-col items-center">
                         <p
                             className="
-                                mb-5 text-xs font-semibold uppercase
-                                tracking-[0.3em] text-cyan-500
-                                drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]
-                                sm:text-sm
-                            "
+            mb-5 text-xs font-bold uppercase
+            tracking-[0.3em] text-cyan-400
+            drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]
+            drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]
+            sm:text-sm
+    "
                         >
                             Urban Barbershop
                         </p>
@@ -208,7 +209,7 @@ export default function Home() {
             <section
                 id="o-nama"
                 className="
-         relative scroll-mt-20 overflow-hidden
+         relative scroll-mt-24 overflow-hidden
          border-t border-white/5
          pt-24 pb-10
           sm:pt-32 sm:pb-14

@@ -21,7 +21,7 @@ export default function ContactSection() {
         <section
             id="kontakt"
             aria-labelledby="contact-heading"
-            className="relative scroll-mt-20 overflow-hidden border-t border-white/5 bg-[#041426] py-20 sm:py-24"
+            className="relative scroll-mt-24 overflow-hidden border-t border-white/5 bg-[#041426] py-20 sm:py-24"
         >
             <div
                 aria-hidden="true"

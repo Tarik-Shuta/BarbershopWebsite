@@ -253,8 +253,8 @@ export default function Layout() {
                     </Link>
 
                         {session ? <>
-                            <Link to={session.user.role === 'BARBER' ? '/barber' : '/book'} className="text-sm text-white/75 hover:text-white">
-                                {session.user.role === 'BARBER' ? 'Dashboard' : session.user.name}
+                            <Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} className="text-sm text-white/75 hover:text-white">
+                                {session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}
                             </Link>
                             <button onClick={() => { clearSession(); setSession(null); navigate('/'); }} className="text-sm text-white/50 hover:text-white">Odjava</button>
                         </> : <Link to="/account" className="text-sm text-white/75 hover:text-white">Prijava</Link>}
@@ -363,7 +363,7 @@ export default function Layout() {
                         >
                             Zakaži termin
                         </Link>
-                        {session ? <button onClick={() => { clearSession(); setSession(null); setMenuOpen(false); }} className="mt-4 py-3 text-left text-sm text-white/70">Odjava</button> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
+                        {session ? <><Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">{session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}</Link><button onClick={() => { clearSession(); setSession(null); setMenuOpen(false); navigate('/'); }} className="py-3 text-left text-sm text-white/70">Odjava</button></> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
                     </div>
                 </div>
             </header>

@@ -39,7 +39,7 @@ export default function Account() {
         user: result.user,
       });
 
-      navigate(result.user.role === "BARBER" ? "/barber" : "/book");
+      navigate(result.user.role === "BARBER" ? "/barber" : "/profile");
     } catch {
       setError("Nije moguće povezati se sa serverom.");
     }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Logo from '../assets/Urban.png'
 import { clearSession, getSession } from '../lib/session.ts'
@@ -10,59 +10,59 @@ const navItems = [
     { label: 'Kontakt', id: 'kontakt' },
 ]
 
+const SECTION_SCROLL_OFFSET = 104
+
+function scrollToSectionWithOffset(id: string) {
+    const section = document.getElementById(id)
+
+    if (!section) return false
+
+    const top = section.getBoundingClientRect().top + window.scrollY - SECTION_SCROLL_OFFSET
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+    return true
+}
+
 export default function Layout() {
     const [menuOpen, setMenuOpen] = useState(false)
     const [activeSection, setActiveSection] = useState('')
     const [session, setSession] = useState(getSession())
+    const pendingSectionId = useRef<string | null>(null)
     const navigate = useNavigate()
     const location = useLocation()
 
     const handleSectionNavigation = (id: string) => {
-        const hash = `#${id}`
-
         setMenuOpen(false)
 
-        if (location.pathname === '/' && location.hash === hash) {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        if (location.pathname === '/') {
+            scrollToSectionWithOffset(id)
             return
         }
 
-        navigate({ pathname: '/', hash })
+        pendingSectionId.current = id
+        navigate('/')
     }
 
     useEffect(() => setSession(getSession()), [location.pathname])
 
     useEffect(() => {
-        const sectionObserver = new IntersectionObserver(
-            (entries) => {
-                const visibleSection = entries
-                    .filter((entry) => entry.isIntersecting)
-                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        let activeFrame = 0
+        const updateActiveSection = () => {
+            cancelAnimationFrame(activeFrame)
+            activeFrame = requestAnimationFrame(() => {
+                const activationLine = SECTION_SCROLL_OFFSET + 24
+                const sections = navItems
+                    .map(({ id }) => document.getElementById(id))
+                    .filter((section): section is HTMLElement => section !== null)
+                    .filter((section) => section.getBoundingClientRect().top <= activationLine)
+                const currentSection = sections[sections.length - 1]
 
-                if (visibleSection) {
-                    setActiveSection(visibleSection.target.id)
-                }
-            },
-            { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.25, 0.5] },
-        )
-
-        const observedSections = new Set<HTMLElement>()
-        const observeSections = () => {
-            navItems.forEach(({ id }) => {
-                const section = document.getElementById(id)
-
-                if (section && !observedSections.has(section)) {
-                    observedSections.add(section)
-                    sectionObserver.observe(section)
-                }
+                setActiveSection(currentSection?.id ?? '')
             })
         }
 
-        observeSections()
-
-        // The Outlet's route content can mount after Layout, so observe added sections too.
-        const sectionMutationObserver = new MutationObserver(observeSections)
-        sectionMutationObserver.observe(document.body, { childList: true, subtree: true })
+        window.addEventListener('scroll', updateActiveSection, { passive: true })
+        window.addEventListener('resize', updateActiveSection)
+        updateActiveSection()
 
         const revealElements = document.querySelectorAll<HTMLElement>('[data-reveal]')
         const revealObserver = new IntersectionObserver(
@@ -83,55 +83,42 @@ export default function Layout() {
         })
 
         return () => {
-            sectionObserver.disconnect()
-            sectionMutationObserver.disconnect()
+            window.removeEventListener('scroll', updateActiveSection)
+            window.removeEventListener('resize', updateActiveSection)
+            cancelAnimationFrame(activeFrame)
             revealObserver.disconnect()
         }
     }, [location.pathname])
 
     useEffect(() => {
-        if (location.pathname !== '/' || !location.hash) {
-            return
-        }
+        const sectionId = pendingSectionId.current
+        if (location.pathname !== '/' || !sectionId) return
 
-        const sectionId = location.hash.slice(1)
         let animationFrame: number | undefined
+        const scrollWhenReady = () => {
+            if (!document.getElementById(sectionId)) return false
 
-        const scrollToSection = () => {
-            const section = document.getElementById(sectionId)
-
-            if (!section) {
-                return false
-            }
-
-            animationFrame = requestAnimationFrame(() => {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            })
+            pendingSectionId.current = null
+            animationFrame = requestAnimationFrame(() => scrollToSectionWithOffset(sectionId))
             return true
         }
 
-        if (scrollToSection()) {
+        if (scrollWhenReady()) {
             return () => {
-                if (animationFrame !== undefined) {
-                    cancelAnimationFrame(animationFrame)
-                }
+                if (animationFrame !== undefined) cancelAnimationFrame(animationFrame)
             }
         }
 
         const homeMutationObserver = new MutationObserver(() => {
-            if (scrollToSection()) {
-                homeMutationObserver.disconnect()
-            }
+            if (scrollWhenReady()) homeMutationObserver.disconnect()
         })
         homeMutationObserver.observe(document.body, { childList: true, subtree: true })
 
         return () => {
             homeMutationObserver.disconnect()
-            if (animationFrame !== undefined) {
-                cancelAnimationFrame(animationFrame)
-            }
+            if (animationFrame !== undefined) cancelAnimationFrame(animationFrame)
         }
-    }, [location.hash, location.pathname])
+    }, [location.pathname])
 
     useEffect(() => {
         const closeMenu = (event: KeyboardEvent) => {

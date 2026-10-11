@@ -182,6 +182,14 @@ export default function Home() {
 
                             <a
                                 href="#usluge"
+                                onClick={(event) => {
+                                    event.preventDefault()
+                                    const section = document.getElementById("usluge")
+                                    if (section) {
+                                        const top = section.getBoundingClientRect().top + window.scrollY - 104
+                                        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+                                    }
+                                }}
                                 className="
                                     inline-flex min-w-44 items-center justify-center
                                     rounded-full

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, clearSession, getSession } from "../lib/session.ts";
+import { api, getSession, logout } from "../lib/session.ts";
 
 type Booking = { id: string; name: string; phone: string; service: string; startsAt: string; status: "PENDING" | "CONFIRMED" | "DECLINED"; notes: string | null; user: { email: string } | null };
 const clock = (value: string) => new Intl.DateTimeFormat("bs-BA", { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
@@ -78,7 +78,7 @@ export default function BarberDashboard() {
   return <section className="min-h-[calc(100svh-5rem)] bg-[#041426] px-5 py-12 text-white sm:px-8 sm:py-16"><div className="mx-auto max-w-4xl">
     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-7">
       <div><p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Barber dashboard</p><h1 className="mt-3 text-4xl font-bold">Rezervacije</h1><p className="mt-2 text-white/60">{session.user.barberName} · budući zahtjevi i današnji termini</p></div>
-      <button className="text-sm text-cyan-300" onClick={() => { clearSession(); navigate("/account"); }}>Odjava</button>
+      <button className="text-sm text-cyan-300" onClick={() => { void logout().finally(() => navigate("/account")); }}>Odjava</button>
     </div>
     {error && <p role="alert" className="mt-5 text-rose-300">{error}</p>}
 

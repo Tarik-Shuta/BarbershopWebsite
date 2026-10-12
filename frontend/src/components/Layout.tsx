@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import Lenis from 'lenis'
 import Logo from '../assets/Urban.png'
-import { clearSession, getSession } from '../lib/session.ts'
+import { api, clearSession, getSession, logout, saveSession, type SessionUser } from '../lib/session.ts'
+import { scrollToHomeSection, setHomeLenis } from '../lib/smoothScroll.ts'
 
 const navItems = [
     { label: 'O nama', id: 'o-nama' },
@@ -10,16 +12,15 @@ const navItems = [
     { label: 'Kontakt', id: 'kontakt' },
 ]
 
-const SECTION_SCROLL_OFFSET = 104
+const SECTION_SCROLL_OFFSET = 0
+const SECTION_ACTIVATION_LINE = 104
 
 function scrollToSectionWithOffset(id: string) {
     const section = document.getElementById(id)
 
     if (!section) return false
 
-    const top = section.getBoundingClientRect().top + window.scrollY - SECTION_SCROLL_OFFSET
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
-    return true
+    return scrollToHomeSection(id, SECTION_SCROLL_OFFSET)
 }
 
 export default function Layout() {
@@ -45,15 +46,63 @@ export default function Layout() {
     useEffect(() => setSession(getSession()), [location.pathname])
 
     useEffect(() => {
+        let active = true
+        void api('/auth/me')
+            .then(async (response) => {
+                if (!active) return
+                if (!response.ok) {
+                    clearSession()
+                    setSession(null)
+                    return
+                }
+                const result = await response.json() as { user: SessionUser }
+                saveSession(result.user)
+                setSession({ user: result.user })
+            })
+            .catch(() => {
+                if (active) {
+                    clearSession()
+                    setSession(null)
+                }
+            })
+        return () => { active = false }
+    }, [])
+
+    useEffect(() => {
+        if (location.pathname !== '/') {
+            setHomeLenis(null)
+            return
+        }
+
+        const lenis = new Lenis({
+            smoothWheel: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        })
+        setHomeLenis(lenis)
+
+        let frame = 0
+        const raf = (time: number) => {
+            lenis.raf(time)
+            frame = requestAnimationFrame(raf)
+        }
+
+        frame = requestAnimationFrame(raf)
+
+        return () => {
+            cancelAnimationFrame(frame)
+            lenis.destroy()
+            setHomeLenis(null)
+        }
+    }, [location.pathname])
+
+    useEffect(() => {
         let activeFrame = 0
         const updateActiveSection = () => {
             cancelAnimationFrame(activeFrame)
             activeFrame = requestAnimationFrame(() => {
-                const activationLine = SECTION_SCROLL_OFFSET + 24
                 const sections = navItems
                     .map(({ id }) => document.getElementById(id))
                     .filter((section): section is HTMLElement => section !== null)
-                    .filter((section) => section.getBoundingClientRect().top <= activationLine)
+                    .filter((section) => section.getBoundingClientRect().top <= SECTION_ACTIVATION_LINE)
                 const currentSection = sections[sections.length - 1]
 
                 setActiveSection(currentSection?.id ?? '')
@@ -243,7 +292,7 @@ export default function Layout() {
                             <Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} className="text-sm text-white/75 hover:text-white">
                                 {session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}
                             </Link>
-                            <button onClick={() => { clearSession(); setSession(null); navigate('/'); }} className="text-sm text-white/50 hover:text-white">Odjava</button>
+                            <button onClick={() => { void logout().finally(() => { setSession(null); navigate('/') }) }} className="text-sm text-white/50 hover:text-white">Odjava</button>
                         </> : <Link to="/account" className="text-sm text-white/75 hover:text-white">Prijava</Link>}
                     </div>
 
@@ -350,7 +399,7 @@ export default function Layout() {
                         >
                             Zakaži termin
                         </Link>
-                        {session ? <><Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">{session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}</Link><button onClick={() => { clearSession(); setSession(null); setMenuOpen(false); navigate('/'); }} className="py-3 text-left text-sm text-white/70">Odjava</button></> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
+                        {session ? <><Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">{session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}</Link><button onClick={() => { void logout().finally(() => { setSession(null); setMenuOpen(false); navigate('/') }) }} className="py-3 text-left text-sm text-white/70">Odjava</button></> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
                     </div>
                 </div>
             </header>

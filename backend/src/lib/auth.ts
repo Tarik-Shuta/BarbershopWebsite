@@ -6,6 +6,21 @@ import { prisma } from "./prisma.js";
 const scrypt = promisify(scryptCallback);
 const tokenSecret = process.env.AUTH_SECRET ?? (process.env.NODE_ENV === "production" ? "" : "development-only-secret-change-me");
 if (!tokenSecret) throw new Error("AUTH_SECRET must be set in production");
+const AUTH_COOKIE = "urban_auth";
+const AUTH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
+
+function authCookie(token: string, maxAge = AUTH_COOKIE_MAX_AGE) {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${AUTH_COOKIE}=${token}; HttpOnly; Path=/api; SameSite=Lax; Max-Age=${maxAge}${secure}`;
+}
+
+export function setAuthCookie(response: Response, token: string) {
+  response.append("Set-Cookie", authCookie(token));
+}
+
+export function clearAuthCookie(response: Response) {
+  response.append("Set-Cookie", authCookie("", 0));
+}
 
 export type AuthenticatedUser = {
   id: string;
@@ -55,7 +70,24 @@ export function createToken(user: AuthenticatedUser) {
 }
 
 export async function requireAuth(request: Request, response: Response, next: NextFunction) {
-  const token = request.header("authorization")?.replace(/^Bearer\s+/i, "");
+  const bearerToken = request.header("authorization")?.replace(/^Bearer\s+/i, "");
+  const cookieToken = request.headers.cookie
+    ?.split(";")
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${AUTH_COOKIE}=`))
+    ?.slice(AUTH_COOKIE.length + 1);
+  const token = bearerToken || cookieToken;
+
+  if (!bearerToken && cookieToken && !["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    const origin = request.header("origin");
+    const allowedOrigins = (process.env.FRONTEND_URL ?? "http://localhost:5173,https://urban-barbershop.onrender.com")
+      .split(",").map((value) => value.trim()).filter(Boolean);
+    if (!origin || !allowedOrigins.includes(origin)) {
+      response.status(403).json({ error: "Request origin is not allowed" });
+      return;
+    }
+  }
+
   if (!token) {
     response.status(401).json({ error: "Authentication is required" });
     return;

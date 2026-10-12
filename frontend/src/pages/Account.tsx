@@ -25,19 +25,15 @@ export default function Account() {
 
       const result = (await response.json()) as {
         error?: string;
-        token?: string;
         user?: SessionUser;
       };
 
-      if (!response.ok || !result.token || !result.user) {
+      if (!response.ok || !result.user) {
         setError(result.error ?? "Prijava nije uspjela.");
         return;
       }
 
-      saveSession({
-        token: result.token,
-        user: result.user,
-      });
+      saveSession(result.user);
 
       navigate(result.user.role === "BARBER" ? "/barber" : "/profile");
     } catch {

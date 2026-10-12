@@ -38,7 +38,6 @@ h1 {
 }
 
 html {
-  scroll-behavior: smooth;
   background: #041426;
 }
 
@@ -133,10 +132,6 @@ p {
     }
 }
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   [data-reveal].reveal-ready,
   [data-reveal].reveal-ready.is-visible {
     opacity: 1;

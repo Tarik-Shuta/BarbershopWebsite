@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { createToken, hashPassword, requireAuth, verifyPassword, type AuthenticatedUser } from "../lib/auth.js";
+import { clearAuthCookie, createToken, hashPassword, requireAuth, setAuthCookie, verifyPassword, type AuthenticatedUser } from "../lib/auth.js";
 import { prisma } from "../lib/prisma.js";
 
 const credentialsSchema = z.object({
@@ -23,8 +23,9 @@ const publicUserFields = {
   barberName: true,
 } satisfies Prisma.UserSelect;
 
-function userResponse(user: AuthenticatedUser) {
-  return { user, token: createToken(user) };
+function sendAuthResponse(user: AuthenticatedUser, response: import("express").Response) {
+  setAuthCookie(response, createToken(user));
+  response.json({ user });
 }
 
 export const authRouter = Router();
@@ -54,7 +55,8 @@ authRouter.post("/register", async (request, response) => {
     }
     throw error;
   }
-  response.status(201).json(userResponse(user));
+  setAuthCookie(response, createToken(user));
+  response.status(201).json({ user });
 });
 
 authRouter.post("/login", async (request, response) => {
@@ -74,7 +76,12 @@ authRouter.post("/login", async (request, response) => {
   }
 
   const { passwordHash: _passwordHash, ...user } = account;
-  response.json(userResponse(user));
+  sendAuthResponse(user, response);
+});
+
+authRouter.post("/logout", (_request, response) => {
+  clearAuthCookie(response);
+  response.status(204).end();
 });
 
 function isDuplicateEmail(error: unknown): boolean {

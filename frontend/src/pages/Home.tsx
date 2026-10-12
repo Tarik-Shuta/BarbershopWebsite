@@ -4,6 +4,7 @@ import BarbershopMap from "../components/BarbershopMap.tsx";
 import BarbersSection from "../components/BarbersSection.tsx";
 import Prices from "../components/Prices.tsx";
 import ContactSection from "../components/ContactSection.tsx";
+import { scrollToHomeSection } from "../lib/smoothScroll.ts";
 
 /*const services = [
     {
@@ -184,11 +185,7 @@ export default function Home() {
                                 href="#usluge"
                                 onClick={(event) => {
                                     event.preventDefault()
-                                    const section = document.getElementById("usluge")
-                                    if (section) {
-                                        const top = section.getBoundingClientRect().top + window.scrollY - 104
-                                        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
-                                    }
+                                    scrollToHomeSection("usluge")
                                 }}
                                 className="
                                     inline-flex min-w-44 items-center justify-center

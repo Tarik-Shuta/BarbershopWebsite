@@ -14,19 +14,19 @@ const apiUrl = (configuredApiUrl || (import.meta.env.DEV ? "http://localhost:300
 
 export const getSession = () => {
   try {
-    return JSON.parse(
-        localStorage.getItem("urban-session") ?? "null"
-    ) as { token: string; user: SessionUser } | null;
+    const stored = JSON.parse(localStorage.getItem("urban-session") ?? "null") as
+      | { user?: SessionUser; token?: string }
+      | null;
+    if (!stored?.user) return null;
+    if (stored.token) localStorage.setItem("urban-session", JSON.stringify({ user: stored.user }));
+    return { user: stored.user };
   } catch {
     return null;
   }
 };
 
-export const saveSession = (session: {
-  token: string;
-  user: SessionUser;
-}) => {
-  localStorage.setItem("urban-session", JSON.stringify(session));
+export const saveSession = (user: SessionUser) => {
+  localStorage.setItem("urban-session", JSON.stringify({ user }));
 };
 
 export const clearSession = () => {
@@ -34,7 +34,6 @@ export const clearSession = () => {
 };
 
 export async function api(path: string, options: RequestInit = {}) {
-  const session = getSession();
   const headers = new Headers(options.headers);
 
   if (!apiUrl && import.meta.env.PROD) {
@@ -44,12 +43,19 @@ export async function api(path: string, options: RequestInit = {}) {
     headers.set("Content-Type", "application/json");
   }
 
-  if (session) {
-    headers.set("Authorization", `Bearer ${session.token}`);
-  }
-
-  return fetch(`${apiUrl}/api${path}`, {
+  const response = await fetch(`${apiUrl}/api${path}`, {
     ...options,
     headers,
+    credentials: "include",
   });
+  if (response.status === 401) clearSession();
+  return response;
+}
+
+export async function logout() {
+  try {
+    await api("/auth/logout", { method: "POST" });
+  } finally {
+    clearSession();
+  }
 }

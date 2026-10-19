@@ -11,7 +11,7 @@ const AUTH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
 
 function authCookie(token: string, maxAge = AUTH_COOKIE_MAX_AGE) {
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  return `${AUTH_COOKIE}=${token}; HttpOnly; Path=/api; SameSite=Lax; Max-Age=${maxAge}${secure}`;
+  return `${AUTH_COOKIE}=${token}; HttpOnly; Path=/api; SameSite=None; Max-Age=${maxAge}${secure}`;
 }
 
 export function setAuthCookie(response: Response, token: string) {

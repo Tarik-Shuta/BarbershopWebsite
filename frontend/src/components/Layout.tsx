@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Lenis from 'lenis'
 import Logo from '../assets/Urban.png'
-import { api, clearSession, getSession, logout, saveSession, type SessionUser } from '../lib/session.ts'
+import { api, clearSession, getSession, logout, saveSession, subscribeToSession, type SessionUser } from '../lib/session.ts'
 import { scrollToHomeSection, setHomeLenis } from '../lib/smoothScroll.ts'
 
 const navItems = [
@@ -26,7 +26,7 @@ function scrollToSectionWithOffset(id: string) {
 export default function Layout() {
     const [menuOpen, setMenuOpen] = useState(false)
     const [activeSection, setActiveSection] = useState('')
-    const [session, setSession] = useState(getSession())
+    const session = useSyncExternalStore(subscribeToSession, getSession, () => null)
     const pendingSectionId = useRef<string | null>(null)
     const navigate = useNavigate()
     const location = useLocation()
@@ -43,26 +43,24 @@ export default function Layout() {
         navigate('/')
     }
 
-    useEffect(() => setSession(getSession()), [location.pathname])
-
     useEffect(() => {
         let active = true
+        const sessionAtRequestStart = getSession()
         void api('/auth/me')
             .then(async (response) => {
-                if (!active) return
+                if (!active || getSession() !== sessionAtRequestStart) return
                 if (!response.ok) {
                     clearSession()
-                    setSession(null)
                     return
                 }
-                const result = await response.json() as { user: SessionUser }
-                saveSession(result.user)
-                setSession({ user: result.user })
+                const result = await response.json() as { user: SessionUser | null }
+                if (!active || getSession() !== sessionAtRequestStart) return
+                if (result.user) saveSession(result.user)
+                else clearSession()
             })
             .catch(() => {
-                if (active) {
+                if (active && getSession() === sessionAtRequestStart) {
                     clearSession()
-                    setSession(null)
                 }
             })
         return () => { active = false }
@@ -292,7 +290,7 @@ export default function Layout() {
                             <Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} className="text-sm text-white/75 hover:text-white">
                                 {session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}
                             </Link>
-                            <button onClick={() => { void logout().finally(() => { setSession(null); navigate('/') }) }} className="text-sm text-white/50 hover:text-white">Odjava</button>
+                            <button onClick={() => { void logout().finally(() => navigate('/')) }} className="text-sm text-white/50 hover:text-white">Odjava</button>
                         </> : <Link to="/account" className="text-sm text-white/75 hover:text-white">Prijava</Link>}
                     </div>
 
@@ -399,7 +397,7 @@ export default function Layout() {
                         >
                             Zakaži termin
                         </Link>
-                        {session ? <><Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">{session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}</Link><button onClick={() => { void logout().finally(() => { setSession(null); setMenuOpen(false); navigate('/') }) }} className="py-3 text-left text-sm text-white/70">Odjava</button></> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
+                        {session ? <><Link to={session.user.role === 'BARBER' ? '/barber' : '/profile'} onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">{session.user.role === 'BARBER' ? 'Dashboard' : 'Profil'}</Link><button onClick={() => { void logout().finally(() => { setMenuOpen(false); navigate('/') }) }} className="py-3 text-left text-sm text-white/70">Odjava</button></> : <Link to="/account" onClick={() => setMenuOpen(false)} className="mt-4 py-3 text-sm text-white/70">Prijava / Registracija</Link>}
                     </div>
                 </div>
             </header>

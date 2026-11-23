@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test src/**/*.test.ts",
-    "start": "node dist/server.js",
+    "start": "node -e \"process.env.NODE_ENV='production'; import('./dist/server.js')\"",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",

@@ -42,31 +42,55 @@ bookingsRouter.post("/", requireAuth, async (request, response) => {
     return;
   }
 
-  const conflict = await prisma.booking.findFirst({ where: { barber: parsed.data.barber, startsAt, status: { in: ["PENDING", "CONFIRMED"] } } });
-  if (conflict) { response.status(409).json({ error: "That slot has just been booked. Please choose another." }); return; }
+  const account = request.user;
+  if (!account) {
+    response.status(401).json({ error: "Authentication is required" });
+    return;
+  }
 
-  const account = request.user!;
+  const booking = await prisma.$transaction(async (transaction) => {
+    // Serialize booking attempts for this barber and exact time. The transaction
+    // lock stays held until the conflict check and insert have both completed.
+    const lockKey = JSON.stringify([parsed.data.barber, startsAt.toISOString()]);
+    await transaction.$queryRaw`
+      WITH lock AS MATERIALIZED (
+        SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))
+      )
+      SELECT 1 FROM lock
+    `;
 
-  const booking = await prisma.booking.create({
-    data: {
-      name: account.name,
-      phone: account.phone,
-      barber: parsed.data.barber,
-      service: parsed.data.service,
-      startsAt,
-      notes: parsed.data.notes ?? null,
-      userId: account.id,
-    },
-    select: {
-      id: true,
-      name: true,
-      barber: true,
-      service: true,
-      startsAt: true,
-      status: true,
-      createdAt: true,
-    },
+    const conflict = await transaction.booking.findFirst({
+      where: { barber: parsed.data.barber, startsAt, status: { in: ["PENDING", "CONFIRMED"] } },
+      select: { id: true },
+    });
+    if (conflict) return null;
+
+    return transaction.booking.create({
+      data: {
+        name: account.name,
+        phone: account.phone,
+        barber: parsed.data.barber,
+        service: parsed.data.service,
+        startsAt,
+        notes: parsed.data.notes ?? null,
+        userId: account.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        barber: true,
+        service: true,
+        startsAt: true,
+        status: true,
+        createdAt: true,
+      },
+    });
   });
+
+  if (!booking) {
+    response.status(409).json({ error: "That slot has just been booked. Please choose another." });
+    return;
+  }
 
   response.status(201).json({ booking });
 });

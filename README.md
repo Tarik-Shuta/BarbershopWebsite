@@ -59,10 +59,12 @@ Create a `.env` file with:
 
 ```env
 DATABASE_URL=your_postgresql_connection_string
-AUTH_SECRET=your_secret
+AUTH_SECRET=replace_with_a_random_secret
 FRONTEND_URL=http://localhost:5173
 PORT=3000
 ```
+
+Generate a strong secret with `openssl rand -base64 48` and use the output for `AUTH_SECRET`.
 
 ### Frontend
 

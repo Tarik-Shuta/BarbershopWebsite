@@ -13,4 +13,8 @@ The health check is `GET /health`. It reports whether both the API and its datab
 
 For production, build with `npm run build`, apply committed migrations with `npm run db:deploy`, then run `npm start`.
 
+`npm start` sets `NODE_ENV=production` before loading the app, so the backend refuses to start without `AUTH_SECRET`. Use a randomly generated secret of at least 32 bytes (for example, `openssl rand -base64 48`).
+
+Login attempts are limited per client IP in the backend process. If the service is scaled to multiple instances, move this limit to shared storage so it applies across all instances.
+
 For hosting, add `DATABASE_URL`, `AUTH_SECRET`, and `FRONTEND_URL` in the backend service's environment settings. Set `FRONTEND_URL` to every deployed frontend origin (scheme and hostname, without a path), separated by commas. Set the frontend build's `VITE_API_URL` to the backend's public origin (for example `https://your-backend.onrender.com`, without `/api`) and `VITE_MAPBOX_ACCESS_TOKEN` to a public Mapbox token. Vite embeds `VITE_*` values at build time, so set them before building or redeploying the frontend. The Mapbox token must allow the deployed frontend URL in its URL restrictions. After deploy, check `https://<backend-host>/health`; `database: "connected"` means the API and database are ready.

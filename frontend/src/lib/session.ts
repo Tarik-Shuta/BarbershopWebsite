@@ -12,7 +12,10 @@ const apiUrl = (configuredApiUrl || (import.meta.env.DEV ? "http://localhost:300
   .replace(/\/+$/, "")
   .replace(/\/api$/i, "");
 
-export const getSession = () => {
+type Session = { user: SessionUser };
+
+function readStoredSession(): Session | null {
+  if (typeof localStorage === "undefined") return null;
   try {
     const stored = JSON.parse(localStorage.getItem("urban-session") ?? "null") as
       | { user?: SessionUser; token?: string }
@@ -23,14 +26,41 @@ export const getSession = () => {
   } catch {
     return null;
   }
+}
+
+let sessionSnapshot = readStoredSession();
+const sessionListeners = new Set<() => void>();
+
+function notifySessionChange() {
+  sessionListeners.forEach((listener) => listener());
+}
+
+export const getSession = () => sessionSnapshot;
+
+export const subscribeToSession = (listener: () => void) => {
+  sessionListeners.add(listener);
+  return () => sessionListeners.delete(listener);
 };
+
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === "urban-session") {
+      sessionSnapshot = readStoredSession();
+      notifySessionChange();
+    }
+  });
+}
 
 export const saveSession = (user: SessionUser) => {
   localStorage.setItem("urban-session", JSON.stringify({ user }));
+  sessionSnapshot = { user };
+  notifySessionChange();
 };
 
 export const clearSession = () => {
   localStorage.removeItem("urban-session");
+  sessionSnapshot = null;
+  notifySessionChange();
 };
 
 export async function api(path: string, options: RequestInit = {}) {

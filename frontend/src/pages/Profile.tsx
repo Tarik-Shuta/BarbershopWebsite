@@ -23,17 +23,20 @@ const statusLabels: Record<Booking["status"], string> = {
 
 export default function Profile() {
   const session = getSession();
+  const userId = session?.user.id;
+  const userRole = session?.user.role;
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       navigate("/account", { replace: true });
       return;
     }
-    if (session.user.role === "BARBER") {
+    if (userRole === "BARBER") {
       navigate("/barber", { replace: true });
       return;
     }
@@ -48,11 +51,10 @@ export default function Profile() {
         setError(cause instanceof Error ? cause.message : "Profil trenutno nije moguće učitati.");
       })
       .finally(() => setLoading(false));
-  }, [navigate, session?.user.role]);
+  }, [navigate, userId, userRole]);
 
   if (!session || session.user.role === "BARBER") return null;
 
-  const now = Date.now();
   const pastHaircuts = bookings
     .filter((booking) => booking.status === "CONFIRMED" && new Date(booking.startsAt).getTime() <= now)
     .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());

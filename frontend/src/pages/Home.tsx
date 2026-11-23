@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import enterijer from "../assets/benterijer.png";
 import BarbershopMap from "../components/BarbershopMap.tsx";
 import BarbersSection from "../components/BarbersSection.tsx";
@@ -6,34 +7,9 @@ import Prices from "../components/Prices.tsx";
 import ContactSection from "../components/ContactSection.tsx";
 import { scrollToHomeSection } from "../lib/smoothScroll.ts";
 
-/*const services = [
-    {
-        number: "01",
-        title: "Muško šišanje",
-        description:
-            "Precizno šišanje prilagođeno vašem stilu, obliku lica i željenom izgledu.",
-        price: "20 KM",
-        image: enterijer,e
-    },
-    {
-        number: "02",
-        title: "Uređivanje brade",
-        description:
-            "Oblikovanje i uređivanje brade za čist, uredan i moderan izgled.",
-        price: "15 KM",
-        image: enterijer,
-    },
-    {
-        number: "03",
-        title: "Šišanje + brada",
-        description:
-            "Kompletan tretman koji kombinuje šišanje i profesionalno uređivanje brade.",
-        price: "30 KM",
-        image: enterijer,
-    },
-];*/
-
 export default function Home() {
+    const [showMap, setShowMap] = useState(false);
+
     return (
         <main className="overflow-hidden bg-[#041426] text-white">
 
@@ -256,18 +232,29 @@ export default function Home() {
                                 shadow-[0_10px_100px_rgba(0,0,0,0.35)]
                             ">
                             <div className="h-120">
-                                <BarbershopMap />
-                            </div>
-
-                            <div
-                                className="
+                                {showMap ? (
+                                    <>
+                                        <BarbershopMap />
+                                        <div
+                                            className="
                                     absolute inset-0
                                     bg-linear-to-t
                                     from-[#041426]/60
                                     via-transparent
                                     to-transparent
                                 "
-                            />
+                                        />
+                                    </>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMap(true)}
+                                        className="flex h-full w-full items-center justify-center bg-[#071c33] text-sm font-semibold text-cyan-300 transition-colors hover:bg-[#0a2542] hover:text-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-cyan-300"
+                                    >
+                                        Show map
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
 

@@ -11,6 +11,10 @@ import { prisma } from "./lib/prisma.js";
 
 const app = express();
 
+// The hosted service terminates HTTPS at its reverse proxy. Trust its forwarded
+// protocol so request.secure reflects the original browser connection.
+app.set("trust proxy", 1);
+
 const frontendUrls = (
     process.env.FRONTEND_URL ??
     "http://localhost:5173,https://urban-barbershop.onrender.com"

@@ -55,19 +55,19 @@ export default function Account() {
 
   return (
       <section className="relative flex h-[calc(100svh-5rem)] items-center justify-center overflow-hidden bg-[#041426] px-5 text-white sm:px-8">
-        {/* Background glow */}
         <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-0 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/[0.06] blur-3xl"
+            className="pointer-events-none absolute left-1/2 top-0 h-112 w-md -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/6 blur-3xl"
         />
 
         <div
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-[-12rem] right-[-8rem] h-80 w-80 rounded-full bg-blue-500/[0.05] blur-3xl"
+            className="pointer-events-none absolute -bottom-48 -right-32 h-80 w-80 rounded-full bg-blue-500/5 blur-3xl"
         />
 
         <div className="relative w-full max-w-md">
-          <div className="rounded-3xl border border-white/[0.08] bg-white/[0.025] px-6 py-6 shadow-2xl shadow-black/20 backdrop-blur-sm sm:px-8 sm:py-7">
+          <div className="rounded-3xl border border-white/8 bg-white/2.5 px-6 py-6 shadow-2xl shadow-black/20 backdrop-blur-sm sm:px-8 sm:py-7">
+
             {/* Header */}
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-cyan-300">

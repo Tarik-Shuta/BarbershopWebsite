@@ -1,7 +1,8 @@
 import { Router } from "express";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { clearAuthCookie, createToken, hashPassword, requireAuth, setAuthCookie, verifyPassword, type AuthenticatedUser } from "../lib/auth.js";
+import { clearAuthCookie, createToken, hashPassword, optionalAuth, requireAuth, setAuthCookie, verifyPassword, type AuthenticatedUser } from "../lib/auth.js";
+import { limitLoginAttempts } from "../lib/loginRateLimit.js";
 import { prisma } from "../lib/prisma.js";
 
 const credentialsSchema = z.object({
@@ -23,8 +24,8 @@ const publicUserFields = {
   barberName: true,
 } satisfies Prisma.UserSelect;
 
-function sendAuthResponse(user: AuthenticatedUser, response: import("express").Response) {
-  setAuthCookie(response, createToken(user));
+function sendAuthResponse(user: AuthenticatedUser, request: import("express").Request, response: import("express").Response) {
+  setAuthCookie(request, response, createToken(user));
   response.json({ user });
 }
 
@@ -55,11 +56,11 @@ authRouter.post("/register", async (request, response) => {
     }
     throw error;
   }
-  setAuthCookie(response, createToken(user));
+  setAuthCookie(request, response, createToken(user));
   response.status(201).json({ user });
 });
 
-authRouter.post("/login", async (request, response) => {
+authRouter.post("/login", limitLoginAttempts, async (request, response) => {
   const parsed = credentialsSchema.safeParse(request.body);
   if (!parsed.success) {
     response.status(400).json({ error: "Invalid email or password" });
@@ -76,11 +77,11 @@ authRouter.post("/login", async (request, response) => {
   }
 
   const { passwordHash: _passwordHash, ...user } = account;
-  sendAuthResponse(user, response);
+  sendAuthResponse(user, request, response);
 });
 
-authRouter.post("/logout", (_request, response) => {
-  clearAuthCookie(response);
+authRouter.post("/logout", (request, response) => {
+  clearAuthCookie(request, response);
   response.status(204).end();
 });
 
@@ -88,6 +89,6 @@ function isDuplicateEmail(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 }
 
-authRouter.get("/me", requireAuth, (request, response) => {
-  response.json({ user: request.user });
+authRouter.get("/me", optionalAuth, (request, response) => {
+  response.json({ user: request.user ?? null });
 });

@@ -6,20 +6,24 @@ import { prisma } from "./prisma.js";
 const scrypt = promisify(scryptCallback);
 const tokenSecret = process.env.AUTH_SECRET ?? (process.env.NODE_ENV === "production" ? "" : "development-only-secret-change-me");
 if (!tokenSecret) throw new Error("AUTH_SECRET must be set in production");
+if (process.env.NODE_ENV === "production" && Buffer.byteLength(tokenSecret) < 32) {
+  throw new Error("AUTH_SECRET must be at least 32 bytes in production");
+}
 const AUTH_COOKIE = "urban_auth";
 const AUTH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
 
-function authCookie(token: string, maxAge = AUTH_COOKIE_MAX_AGE) {
-  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  return `${AUTH_COOKIE}=${token}; HttpOnly; Path=/api; SameSite=None; Max-Age=${maxAge}${secure}`;
+function authCookie(token: string, secure: boolean, maxAge = AUTH_COOKIE_MAX_AGE) {
+  const sameSite = secure ? "None" : "Lax";
+  const secureAttribute = secure ? "; Secure" : "";
+  return `${AUTH_COOKIE}=${token}; HttpOnly; Path=/api; SameSite=${sameSite}; Max-Age=${maxAge}${secureAttribute}`;
 }
 
-export function setAuthCookie(response: Response, token: string) {
-  response.append("Set-Cookie", authCookie(token));
+export function setAuthCookie(request: Request, response: Response, token: string) {
+  response.append("Set-Cookie", authCookie(token, request.secure));
 }
 
-export function clearAuthCookie(response: Response) {
-  response.append("Set-Cookie", authCookie("", 0));
+export function clearAuthCookie(request: Request, response: Response) {
+  response.append("Set-Cookie", authCookie("", request.secure, 0));
 }
 
 export type AuthenticatedUser = {
@@ -123,6 +127,20 @@ export async function requireAuth(request: Request, response: Response, next: Ne
 
   request.user = user;
   next();
+}
+
+export async function optionalAuth(request: Request, response: Response, next: NextFunction) {
+  const hasBearerToken = Boolean(request.header("authorization")?.replace(/^Bearer\s+/i, ""));
+  const hasCookieToken = request.headers.cookie
+    ?.split(";")
+    .some((cookie) => cookie.trim().startsWith(`${AUTH_COOKIE}=`));
+
+  if (!hasBearerToken && !hasCookieToken) {
+    next();
+    return;
+  }
+
+  await requireAuth(request, response, next);
 }
 
 export function requireBarber(request: Request, response: Response, next: NextFunction) {

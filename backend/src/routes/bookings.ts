@@ -101,15 +101,11 @@ bookingsRouter.get("/mine", requireAuth, async (request, response) => {
 });
 
 bookingsRouter.get("/queue", requireAuth, requireBarber, async (request, response) => {
-  const now = new Date();
-  const dayEnd = new Date(now); dayEnd.setHours(24, 0, 0, 0);
   const bookings = await prisma.booking.findMany({
     where: {
       barber: request.user!.barberName!,
-      OR: [
-        { status: "PENDING" },
-        { startsAt: { gte: now, lt: dayEnd }, status: "CONFIRMED" },
-      ],
+      status: "PENDING",
+      startsAt: { gte: new Date() },
     },
     include: { user: { select: { email: true } } }, orderBy: { startsAt: "asc" },
   });
